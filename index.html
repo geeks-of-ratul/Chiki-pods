@@ -3,86 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Stash</title>
+    <title>File Stash & Share</title>
     <style>
         :root {
-            --bg-color: #f4f4f7;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.4);
+            --item-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        [data-theme="light"] {
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
+            --card-border: rgba(0, 0, 0, 0.06);
+            --text-main: #0f172a;
+            --text-muted: #475569;
             --accent: #4f46e5;
-            --border: #e2e8f0;
+            --accent-glow: rgba(79, 70, 229, 0.2);
+            --item-bg: #f1f5f9;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            transition: background 0.3s ease, color 0.3s ease, border 0.3s ease;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-gradient);
             color: var(--text-main);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
             padding: 20px;
         }
 
-        .container {
-            background-color: var(--card-bg);
-            padding: 40px 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            max-width: 450px;
-            width: 100%;
-            text-align: center;
-            border: 1px solid var(--border);
-        }
-
-        .icon {
-            font-size: 48px;
-            margin-bottom: 20px;
-            display: inline-block;
-        }
-
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 12px;
+        /* Theme Toggle */
+        .theme-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
             color: var(--text-main);
+            padding: 10px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        p {
-            font-size: 15px;
-            line-height: 1.6;
-            color: var(--text-muted);
-            margin-bottom: 24px;
+        .theme-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Main Container */
+        .dashboard {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
         }
 
         .badge {
             display: inline-block;
-            background-color: #e0e7ff;
-            color: var(--accent);
-            padding: 6px 12px;
+            background: var(--accent-glow);
+            color: var(--text-main);
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        /* Interactive Upload Zone */
+        .dropzone {
+            border: 2px dashed var(--accent);
+            background: rgba(99, 102, 241, 0.03);
+            border-radius: 16px;
+            padding: 32px 20px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropzone:hover {
+            background: rgba(99, 102, 241, 0.08);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .dropzone-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .dropzone p {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .dropzone span {
+            color: var(--text-muted);
+            font-size: 12px;
+            display: block;
+            margin-top: 4px;
+        }
+
+        /* File List Area */
+        .file-section-title {
+            font-size: 14px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .file-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .file-item {
+            background: var(--item-bg);
+            border: 1px solid var(--card-border);
+            padding: 14px 18px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-item:hover {
+            border-color: var(--accent);
+            transform: translateX(4px);
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .file-meta h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .file-meta span {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .download-btn {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .download-btn:hover {
+            background: var(--accent);
+            color: #ffffff;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="icon">📦</div>
-        <span class="badge">Temporary Gig</span>
-        <h1>File Storage Space</h1>
-        <p>This is just a quick, simple setup to host and save some files. Nothing fancy, just utility.</p>
+    <button class="theme-btn" onclick="toggleTheme()" id="themeToggle">☀️ Light Mode</button>
+
+    <div class="dashboard">
+        <div class="header">
+            <span class="badge">Active Workspace</span>
+            <h1>File Stash</h1>
+            <p class="subtitle">Just a quick, temporary gig setup to save and download necessary project files.</p>
+        </div>
+
+        <!-- Interactive Drag & Drop Area Placeholder -->
+        <div class="dropzone" onclick="alert('File browser opened! (Visual Demo)')">
+            <div class="dropzone-icon">✨</div>
+            <p>Drag & drop files here</p>
+            <span>or click to browse your device</span>
+        </div>
+
+        <!-- Saved Files Display -->
+        <div class="file-section-title">Available Files</div>
+        <ul class="file-list">
+            <li class="file-item">
+                <div class="file-info">
+                    <span style="font-size: 24px;">📄</span>
+                    <div class="file-meta">
+                        <h4>project_assets.zip</h4>
+                        <span>42.8 MB • Added just now</span>
+                    </div>
+                </div>
+                <a href="#" class="download-btn" onclick="event.preventDefault(); alert('Downloading project_assets.zip...');">Download</a>
+            </li>
+            <li class="file-item">
+                <div class="file-info">
+                    <span style="font-size: 24px;">📊</span>
+                    <div class="file-meta">
+                        <h4>final_report.pdf</h4>
+                        <span>2.4 MB • Added 2 hours ago</span>
+                    </div>
+                </div>
+                <a href="#" class="download-btn" onclick="event.preventDefault(); alert('Downloading final_report.pdf...');">Download</a>
+            </li>
+        </ul>
     </div>
 
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.getElementById('themeToggle');
+            
+            if (body.getAttribute('data-theme') === 'light') {
+                body.removeAttribute('data-theme');
+                btn.innerHTML = '☀️ Light Mode';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                btn.innerHTML = '🌙 Dark Mode';
+            }
+        }
+    </script>
 </body>
 </html>
